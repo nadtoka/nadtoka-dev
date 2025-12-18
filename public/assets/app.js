@@ -1,7 +1,7 @@
 (function () {
   const $ = (id) => document.getElementById(id);
 
-  // Year in footer
+  // Year
   const year = $("year");
   if (year) year.textContent = String(new Date().getFullYear());
 
@@ -34,7 +34,7 @@
   }
 
   function setTheme(theme) {
-    // theme can be "dark" or "light" or "" (system)
+    // theme: "dark" | "light" | "" (system)
     if (theme) {
       document.documentElement.dataset.theme = theme;
       localStorage.setItem(storageKey, theme);
@@ -55,14 +55,15 @@
   if (themeToggle) {
     themeToggle.addEventListener("click", () => {
       const current = getEffectiveTheme();
-      // Cycle: system -> opposite -> system (simple UX)
       const savedNow = localStorage.getItem(storageKey);
+
+      // UX: system -> opposite -> system
       if (!savedNow) {
         setTheme(current === "dark" ? "light" : "dark");
-        showToast("Тема зафіксована");
+        showToast("Theme locked");
       } else {
         setTheme("");
-        showToast("Тема: як у системі");
+        showToast("Theme: system");
       }
     });
   }
@@ -83,13 +84,8 @@
   if (copyBtn && emailLink) {
     copyBtn.addEventListener("click", async () => {
       const email = emailLink.textContent.trim();
-      if (!email || email.includes("YOUR_EMAIL")) {
-        showToast("Заміни YOUR_EMAIL у index.html 🙂");
-        return;
-      }
-
       const ok = await copyText(email);
-      showToast(ok ? "Email скопійовано" : "Не вдалось скопіювати (браузер блокує)");
+      showToast(ok ? "Email copied" : "Copy failed (browser blocked)");
     });
   }
 })();
