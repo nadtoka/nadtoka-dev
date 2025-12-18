@@ -1,0 +1,4 @@
+Contact: mailto:YOUR_SECURITY_EMAIL
+Preferred-Languages: uk, en
+Canonical: https://nadtoka.dev/.well-known/security.txt
+Expires: 2026-12-17T00:00:00.000Z

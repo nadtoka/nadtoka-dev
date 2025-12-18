@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+
+  <title>Alex Nadtoka — DevOps / Platform Engineering</title>
+  <meta name="description" content="Alex Nadtoka — DevOps / Platform Engineer. Kubernetes, CI/CD, Observability, Security hardening, cloud cost & reliability." />
+  <link rel="canonical" href="https://nadtoka.dev/" />
+
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Перейти до контенту</a>
+
+  <header class="header">
+    <div class="container header__inner">
+      <a class="brand" href="/" aria-label="На головну">
+        <span class="brand__mark" aria-hidden="true">⎈</span>
+        <span class="brand__text">nadtoka.dev</span>
+      </a>
+
+      <nav class="nav" aria-label="Навігація">
+        <a href="#services">Послуги</a>
+        <a href="#stack">Stack</a>
+        <a href="#work">Підхід</a>
+        <a href="#contact">Контакти</a>
+
+        <button class="btn btn--ghost" id="themeToggle" type="button" aria-label="Перемкнути тему">
+          <span aria-hidden="true" id="themeIcon">☾</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container hero__grid">
+        <div class="hero__copy">
+          <p class="eyebrow">DevOps / Platform Engineering</p>
+
+          <h1 class="hero__title">Alex Nadtoka</h1>
+
+          <p class="lead">
+            Допомагаю командам швидше та безпечніше релізити:
+            <strong>Kubernetes</strong>, <strong>CI/CD</strong>, <strong>Observability</strong>, <strong>Security</strong>.
+          </p>
+
+          <div class="hero__cta">
+            <a class="btn" href="#contact">Написати мені</a>
+            <a class="btn btn--secondary" href="/linkedin">LinkedIn</a>
+            <a class="btn btn--ghost" href="/github">GitHub</a>
+          </div>
+
+          <ul class="chips" aria-label="Ключові напрямки">
+            <li class="chip">Kubernetes</li>
+            <li class="chip">Terraform</li>
+            <li class="chip">GitHub Actions</li>
+            <li class="chip">Prometheus / Grafana</li>
+            <li class="chip">Security hardening</li>
+          </ul>
+
+          <p class="tiny muted">
+            Формат співпраці: аудит → план → зміни → handover (runbooks/dashboards/rollback).
+          </p>
+        </div>
+
+        <div class="hero__panel" aria-label="Terminal card">
+          <div class="terminal">
+            <div class="terminal__bar">
+              <span class="dot" aria-hidden="true"></span>
+              <span class="dot" aria-hidden="true"></span>
+              <span class="dot" aria-hidden="true"></span>
+              <span class="terminal__title">sanity-check</span>
+            </div>
+
+            <div class="terminal__body">
+              <pre class="terminal__pre"><code>$ curl -I https://nadtoka.dev
+HTTP/2 200
+strict-transport-security: max-age=31536000
+content-security-policy: default-src 'self' ...
+x-content-type-options: nosniff
+x-frame-options: DENY</code></pre>
+
+              <p class="terminal__hint">
+                Static на Cloudflare Pages. Мінімум залежностей. Максимум контролю.
+              </p>
+            </div>
+          </div>
+
+          <div class="hero__quick">
+            <div class="quick__item">
+              <div class="quick__k">Фокус</div>
+              <div class="quick__v">стабільність + швидкість релізів</div>
+            </div>
+            <div class="quick__item">
+              <div class="quick__k">Принцип</div>
+              <div class="quick__v">read-only діагностика → зміни</div>
+            </div>
+            <div class="quick__item">
+              <div class="quick__k">Підхід</div>
+              <div class="quick__v">risk check + rollback plan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="section">
+      <div class="container">
+        <h2>Послуги</h2>
+        <p class="muted">
+          Це “візитка + пропозиція”: коротко що роблю і який результат ти отримуєш.
+        </p>
+
+        <div class="cards">
+          <article class="card">
+            <h3>Kubernetes / Platform</h3>
+            <p>Кластери, ingress, GitOps, стандарти деплоїв, ізоляція.</p>
+            <ul class="list">
+              <li>Helm (шаблони/практики), деплой флоу</li>
+              <li>Ingress + TLS (cert automation)</li>
+              <li>RBAC / namespaces / NetworkPolicies</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>CI/CD & Supply Chain</h3>
+            <p>Пайплайни, артефакти, контроль змін, швидкі релізи.</p>
+            <ul class="list">
+              <li>GitHub Actions / GitLab CI</li>
+              <li>Pipeline hygiene, caching, parallelism</li>
+              <li>SAST/SBOM за потреби</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Observability / SRE</h3>
+            <p>Метрики/алерти/дашборди, щоб інциденти були “нудними”.</p>
+            <ul class="list">
+              <li>Prometheus + Grafana</li>
+              <li>Алертинг від SLO (а не “все червоне”)</li>
+              <li>Логи/трейси за потреби</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Security hardening</h3>
+            <p>Прагматична безпека “by default”, без фанатизму.</p>
+            <ul class="list">
+              <li>Least privilege (IAM/RBAC)</li>
+              <li>Secrets hygiene + rotation playbooks</li>
+              <li>Security headers, CSP</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Cost & reliability</h3>
+            <p>Оптимізація без ризику “вбити прод”.</p>
+            <ul class="list">
+              <li>Rightsizing, autoscaling</li>
+              <li>Економія на storage/egress</li>
+              <li>Resilience review + rollback strategy</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="callout">
+          <h3>Що можу зробити швидко (1–3 дні)</h3>
+          <ul class="list">
+            <li>Аудит CI/CD + список “quick wins”</li>
+            <li>Підняти базову observability (метрики/алерти/дашборди)</li>
+            <li>Hardening Kubernetes (RBAC + базові policies)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="stack" class="section section--alt">
+      <div class="container">
+        <h2>Stack</h2>
+
+        <div class="grid2">
+          <div class="panel">
+            <h3>Infra</h3>
+            <ul class="list">
+              <li>Linux • networking • DNS</li>
+              <li>Kubernetes • Helm • ingress</li>
+              <li>Terraform • IaC best practices</li>
+            </ul>
+          </div>
+
+          <div class="panel">
+            <h3>Delivery & observability</h3>
+            <ul class="list">
+              <li>GitHub Actions / GitLab CI</li>
+              <li>Prometheus • Grafana • alerting</li>
+              <li>Logs: ELK / Loki (коли треба)</li>
+            </ul>
+          </div>
+        </div>
+
+        <p class="note">
+          На цьому сайті навмисно **нема важких фреймворків**: це знижує ризики, прискорює завантаження і полегшує підтримку.
+        </p>
+      </div>
+    </section>
+
+    <section id="work" class="section">
+      <div class="container">
+        <h2>Підхід</h2>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step__n">1</div>
+            <div>
+              <h3>Discovery</h3>
+              <p>Швидко фіксую симптоми, обмеження і що реально болить у prod.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step__n">2</div>
+            <div>
+              <h3>Plan + risk check</h3>
+              <p>План змін + rollback. Спочатку read-only діагностика.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step__n">3</div>
+            <div>
+              <h3>Implement</h3>
+              <p>Мінімальні правки, PR-и, review, документація, прозорі зміни.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step__n">4</div>
+            <div>
+              <h3>Handover</h3>
+              <p>Runbooks, dashboards, алерти — щоб команда могла жити без мене.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section section--alt">
+      <div class="container">
+        <h2>Контакти</h2>
+        <p class="muted">Найпростіше — LinkedIn або email.</p>
+
+        <div class="contact">
+          <div class="contact__card">
+            <h3>Email</h3>
+            <p class="contact__value">
+              <a href="mailto:YOUR_EMAIL" id="emailLink">YOUR_EMAIL</a>
+            </p>
+            <button class="btn btn--secondary" type="button" id="copyEmail">Скопіювати email</button>
+            <p class="tiny muted">
+              Рекомендація: зроби окрему пошту під сайт + 2FA.
+            </p>
+          </div>
+
+          <div class="contact__card">
+            <h3>Links</h3>
+            <ul class="list">
+              <li><a href="/linkedin">LinkedIn</a></li>
+              <li><a href="/github">GitHub</a></li>
+              <li><a href="/telegram">Telegram</a> <span class="tiny muted">(optional)</span></li>
+            </ul>
+
+            <p class="tiny muted">
+              Security contact: <a href="/.well-known/security.txt">security.txt</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="callout callout--small">
+          <h3>Зараз / далі</h3>
+          <p class="muted">
+            Зараз це landing + послуги. Далі можна додати blog (Astro/Hugo) і micro-tools через Workers.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p>© <span id="year"></span> Alex Nadtoka</p>
+      <p class="tiny muted">Static • Cloudflare Pages • security headers enabled</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>
