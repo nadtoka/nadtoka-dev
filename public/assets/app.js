@@ -88,5 +88,20 @@
       showToast(ok ? "Email copied" : "Copy failed (browser blocked)");
     });
   }
-})();
+  // Visitor diagnostics
+  const loadDiag = $("loadDiag");
+  const diagOut = $("diagOut");
 
+  if (loadDiag && diagOut) {
+    loadDiag.addEventListener("click", async () => {
+      diagOut.textContent = "Running...\n";
+      try {
+        const r = await fetch("/api/whoami", { headers: { "Accept": "application/json" } });
+        const data = await r.json();
+        diagOut.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        diagOut.textContent = "Failed to load diagnostics.";
+      }
+    });
+  }
+})();
