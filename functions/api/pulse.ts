@@ -4,9 +4,11 @@ type MarketQuote = { symbol: string; price: number; change: number; changesPerce
 const ttlSeconds = 300;
 
 export async function onRequest({ request, env }: { request: Request; env: { FMP_API_KEY?: string } }) {
+  const url = new URL(request.url);
+  const isFresh = url.searchParams.get("fresh") === "1";
   const cache = caches.default;
-  const cacheKey = new Request(new URL(request.url).toString(), request);
-  const cached = await cache.match(cacheKey);
+  const cacheKey = new Request(url.toString(), request);
+  const cached = isFresh ? null : await cache.match(cacheKey);
   if (cached) return cached;
 
   const providers: ProviderStatus[] = [];
@@ -58,7 +60,10 @@ export async function onRequest({ request, env }: { request: Request; env: { FMP
     },
   });
 
-  await cache.put(cacheKey, response.clone());
+  const allUnavailable =
+    providers.length > 0 && providers.every((p) => (p.summary || "").toLowerCase().includes("unavailable"));
+
+  if (!isFresh && !allUnavailable) await cache.put(cacheKey, response.clone());
   return response;
 }
 
@@ -67,10 +72,11 @@ async function fetchAzure(): Promise<ProviderStatus> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Azure status HTTP ${res.status}`);
   const xml = await res.text();
-  const item = parseFirstRssItem(xml);
+  const item = extractFirstRssItem(xml);
+  const summary = item?.title?.replace(/\s+/g, " ").trim();
   return {
     name: "Azure",
-    summary: item?.title || "Latest bulletin unavailable",
+    summary: summary || "Latest bulletin unavailable",
     updated: item?.pubDate || null,
   };
 }
@@ -80,33 +86,30 @@ async function fetchAws(): Promise<ProviderStatus> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`AWS status HTTP ${res.status}`);
   const xml = await res.text();
-  const item = parseFirstRssItem(xml);
+  const item = extractFirstRssItem(xml);
+  const summary = item?.title?.replace(/\s+/g, " ").trim();
   return {
     name: "AWS",
-    summary: item?.title || "Latest bulletin unavailable",
+    summary: summary || "Latest bulletin unavailable",
     updated: item?.pubDate || null,
   };
 }
 
 async function fetchGoogle(): Promise<ProviderStatus> {
-  const url = "https://status.cloud.google.com/incidents.json";
-  const res = await fetch(url);
+  const url = "https://status.cloud.google.com/";
+  const res = await fetch(url, { cf: { cacheEverything: false } });
   if (!res.ok) throw new Error(`Google Cloud status HTTP ${res.status}`);
-  const data = await res.json();
-  if (Array.isArray(data) && data.length === 0) {
-    return { name: "Google Cloud", summary: "No broad severe incidents", updated: new Date().toISOString() };
+  const html = await res.text();
+
+  if (html.includes("No broad severe incidents")) {
+    return { name: "Google Cloud", summary: "No broad severe incidents", updated: null };
   }
 
-  if (Array.isArray(data) && data.length > 0) {
-    const incident = data[0];
-    const summary = (incident?.external_desc || incident?.most_recent_update?.text || incident?.summary || "Latest incident") as string;
-    const time =
-      (incident?.most_recent_update?.created || incident?.begin || incident?.created || incident?.updates?.[0]?.created) ?? null;
-    const updated = time ? String(time) : null;
-    return { name: "Google Cloud", summary: summary.trim(), updated };
-  }
-
-  return { name: "Google Cloud", summary: "Latest incident unavailable", updated: null };
+  return {
+    name: "Google Cloud",
+    summary: "Active incidents reported (see status dashboard)",
+    updated: new Date().toISOString(),
+  };
 }
 
 async function fetchMarkets(apiKey?: string): Promise<[MarketQuote[] | null, string?]> {
@@ -137,19 +140,19 @@ async function fetchMarkets(apiKey?: string): Promise<[MarketQuote[] | null, str
   return [markets];
 }
 
-function parseFirstRssItem(xml: string): { title?: string; pubDate?: string } | null {
-  const itemMatch = xml.match(/<item[^>]*>([\s\S]*?)<\/item>/i);
+function extractFirstRssItem(xmlText: string): { title?: string; pubDate?: string } | null {
+  const itemMatch = xmlText.match(/<item[^>]*>([\s\S]*?)<\/item>/i);
   if (!itemMatch) return null;
-  const item = itemMatch[1];
-  const title = extractTag(item, "title");
-  const pubDate = extractTag(item, "pubDate");
-  return { title, pubDate };
-}
 
-function extractTag(source: string, tag: string): string | undefined {
-  const regex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i");
-  const match = source.match(regex);
-  if (!match) return undefined;
-  const value = match[1].replace(/<!\[CDATA\[(.*?)\]\]>/, "$1").trim();
-  return value;
+  const itemContent = itemMatch[1];
+
+  const titleMatch = itemContent.match(
+    /<title[^>]*>\s*(?:<!\[CDATA\[([\s\S]*?)\]\]>|([\s\S]*?))\s*<\/title>/i
+  );
+  const pubDateMatch = itemContent.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i);
+
+  const title = titleMatch ? (titleMatch[1] ?? titleMatch[2])?.trim() : undefined;
+  const pubDate = pubDateMatch ? pubDateMatch[1]?.trim() : undefined;
+
+  return title || pubDate ? { title, pubDate } : null;
 }

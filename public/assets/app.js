@@ -146,7 +146,8 @@
       else {
         for (const p of providers) {
           const summary = p?.summary || "Unavailable";
-          const updated = p?.updated ? ` (${p.updated})` : "";
+          const updated =
+            typeof p?.updated === "string" && p.updated.trim() ? ` (${p.updated})` : "";
           lines.push(`- ${p?.name || "Provider"}: ${summary}${updated}`);
         }
       }
