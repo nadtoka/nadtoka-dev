@@ -184,15 +184,51 @@ a:hover { opacity: 0.92; }
 }
 
 .avatar {
+  position: relative;
   width: 96px;
   height: 96px;
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-  object-fit: cover;
   background: var(--card2);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar::after {
+  content: attr(data-initials);
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--muted);
+  background: var(--card2);
+}
+
+.avatar.is-loaded::after {
+  content: "";
+}
+
+.avatar__img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 50%;
+  position: relative;
+  z-index: 1;
+  background: var(--card2);
+  opacity: 0;
+  transition: opacity 180ms ease-in-out;
+}
+
+.avatar.is-loaded .avatar__img {
+  opacity: 1;
 }
 
 .eyebrow {
