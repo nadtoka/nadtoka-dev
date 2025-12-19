@@ -144,7 +144,12 @@
       const providers = Array.isArray(parsed.providers) ? parsed.providers : [];
       if (providers.length === 0) lines.push("- Unavailable");
       else {
-        for (const p of providers) {
+        const providerOrder = ["AWS", "Google Cloud", "Azure"];
+        const ordered = providerOrder
+          .map((name) => providers.find((p) => p?.name === name))
+          .filter(Boolean);
+        const remainder = providers.filter((p) => !providerOrder.includes(p?.name));
+        for (const p of [...ordered, ...remainder]) {
           const summary = p?.summary || "Unavailable";
           const updated =
             typeof p?.updated === "string" && p.updated.trim() ? ` (${p.updated})` : "";
