@@ -117,6 +117,6 @@
 
   if (diagOut) {
     loadDiagnostics();
-    (diagPanel || diagOut).addEventListener("click", loadDiagnostics);
+    if (diagPanel) diagPanel.addEventListener("click", loadDiagnostics);
   }
 })();
