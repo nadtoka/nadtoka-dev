@@ -91,6 +91,7 @@
   // Visitor diagnostics
   const diagOut = $("diagOut");
   const diagPanel = document.querySelector(".diag");
+  const pulseOut = $("pulseOut");
 
   async function loadDiagnostics() {
     if (!diagOut) return;
@@ -117,6 +118,67 @@
 
   loadDiagnostics();
   if (diagOut && diagPanel) diagPanel.addEventListener("click", loadDiagnostics);
+
+  // Ops pulse
+  async function loadPulse() {
+    if (!pulseOut) return;
+    pulseOut.textContent = "Loading /api/pulse ...\n";
+    try {
+      const r = await fetch("/api/pulse", { headers: { Accept: "application/json" } });
+      const body = await r.text();
+      if (!r.ok) {
+        pulseOut.textContent = `HTTP ${r.status} ${r.statusText}\n\n${body}`;
+        return;
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(body);
+      } catch (_) {
+        pulseOut.textContent = body;
+        return;
+      }
+
+      const lines = [];
+      lines.push("Provider updates");
+      const providers = Array.isArray(parsed.providers) ? parsed.providers : [];
+      if (providers.length === 0) lines.push("- Unavailable");
+      else {
+        for (const p of providers) {
+          const summary = p?.summary || "Unavailable";
+          const updated = p?.updated ? ` (${p.updated})` : "";
+          lines.push(`- ${p?.name || "Provider"}: ${summary}${updated}`);
+        }
+      }
+
+      lines.push("");
+      lines.push("Market (USD)");
+      const markets = Array.isArray(parsed.markets) ? parsed.markets : null;
+      if (!markets) {
+        lines.push("- Unavailable");
+      } else {
+        for (const m of markets) {
+          const price = typeof m?.price === "number" ? m.price.toFixed(2) : "n/a";
+          const change = typeof m?.change === "number" ? m.change.toFixed(2) : "n/a";
+          const pct =
+            typeof m?.changesPercentage === "number" ? m.changesPercentage.toFixed(2) : "n/a";
+          lines.push(`- ${m?.symbol || "TICKER"}: ${price} (${change} / ${pct}%)`);
+        }
+      }
+
+      lines.push("");
+      if (parsed.note) lines.push(parsed.note);
+      if (parsed.cache?.ttlSeconds)
+        lines.push(`Cache TTL: ${parsed.cache.ttlSeconds}s (server)`);
+      lines.push(`Updated: ${parsed.time || "Unknown"}`);
+
+      pulseOut.textContent = lines.join("\n");
+    } catch (_) {
+      pulseOut.textContent = "Ops pulse temporarily unavailable.";
+    }
+  }
+
+  loadPulse();
 
   // Avatar fallback handling
   const avatar = document.querySelector(".avatar[data-initials]");

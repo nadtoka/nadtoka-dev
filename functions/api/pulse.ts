@@ -1,0 +1,151 @@
+type ProviderStatus = { name: string; summary: string; updated: string | null };
+type MarketQuote = { symbol: string; price: number; change: number; changesPercentage: number };
+
+const ttlSeconds = 300;
+
+export async function onRequest({ request, env }: { request: Request; env: { FMP_API_KEY?: string } }) {
+  const cache = caches.default;
+  const cacheKey = new Request(new URL(request.url).toString(), request);
+  const cached = await cache.match(cacheKey);
+  if (cached) return cached;
+
+  const providers: ProviderStatus[] = [];
+  const errors: string[] = [];
+
+  const azure = await fetchAzure().catch((err) => {
+    errors.push(err.message || "Azure fetch failed");
+    return { name: "Azure", summary: "Latest bulletin unavailable", updated: null };
+  });
+  if (azure) providers.push(azure);
+
+  const google = await fetchGoogle().catch((err) => {
+    errors.push(err.message || "Google Cloud fetch failed");
+    return { name: "Google Cloud", summary: "Latest incident unavailable", updated: null };
+  });
+  if (google) providers.push(google);
+
+  const aws = await fetchAws().catch((err) => {
+    errors.push(err.message || "AWS fetch failed");
+    return { name: "AWS", summary: "Latest bulletin unavailable", updated: null };
+  });
+  if (aws) providers.push(aws);
+
+  const [markets, marketNote] = await fetchMarkets(env.FMP_API_KEY).catch((err) => {
+    errors.push(err.message || "Market fetch failed");
+    return [null, undefined] as const;
+  });
+
+  const payload: {
+    time: string;
+    providers: ProviderStatus[];
+    markets: MarketQuote[] | null;
+    cache: { ttlSeconds: number };
+    note?: string;
+  } = {
+    time: new Date().toISOString(),
+    providers,
+    markets,
+    cache: { ttlSeconds },
+  };
+
+  if (marketNote) payload.note = marketNote;
+  else if (!markets) payload.note = "Set FMP_API_KEY to enable quotes";
+  if (errors.length) payload.note = payload.note ? `${payload.note} | ${errors.join("; ")}` : errors.join("; ");
+
+  const response = new Response(JSON.stringify(payload, null, 2), {
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": `public, max-age=${ttlSeconds}`,
+    },
+  });
+
+  await cache.put(cacheKey, response.clone());
+  return response;
+}
+
+async function fetchAzure(): Promise<ProviderStatus> {
+  const url = "https://azurestatuscdn.azureedge.net/en-us/status/feed/";
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Azure status HTTP ${res.status}`);
+  const xml = await res.text();
+  const item = parseFirstRssItem(xml);
+  return {
+    name: "Azure",
+    summary: item?.title || "Latest bulletin unavailable",
+    updated: item?.pubDate || null,
+  };
+}
+
+async function fetchAws(): Promise<ProviderStatus> {
+  const url = "https://status.aws.amazon.com/rss/all.rss";
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`AWS status HTTP ${res.status}`);
+  const xml = await res.text();
+  const item = parseFirstRssItem(xml);
+  return {
+    name: "AWS",
+    summary: item?.title || "Latest bulletin unavailable",
+    updated: item?.pubDate || null,
+  };
+}
+
+async function fetchGoogle(): Promise<ProviderStatus> {
+  const url = "https://status.cloud.google.com/incidents.json";
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Google Cloud status HTTP ${res.status}`);
+  const data = await res.json();
+  if (Array.isArray(data) && data.length === 0) {
+    return { name: "Google Cloud", summary: "No broad severe incidents", updated: new Date().toISOString() };
+  }
+
+  if (Array.isArray(data) && data.length > 0) {
+    const incident = data[0];
+    const summary = (incident?.external_desc || incident?.most_recent_update?.text || incident?.summary || "Latest incident") as string;
+    const time =
+      (incident?.most_recent_update?.created || incident?.begin || incident?.created || incident?.updates?.[0]?.created) ?? null;
+    const updated = time ? String(time) : null;
+    return { name: "Google Cloud", summary: summary.trim(), updated };
+  }
+
+  return { name: "Google Cloud", summary: "Latest incident unavailable", updated: null };
+}
+
+async function fetchMarkets(apiKey?: string): Promise<[MarketQuote[] | null, string?]> {
+  if (!apiKey) return [null, "Set FMP_API_KEY to enable quotes"];
+
+  const symbols = ["AMZN", "GOOGL", "MSFT"];
+  const url = `https://financialmodelingprep.com/api/v3/quote/${symbols.join(",")}?apikey=${apiKey}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Markets HTTP ${res.status}`);
+  const data = await res.json();
+  if (!Array.isArray(data)) throw new Error("Unexpected market response");
+
+  const markets: MarketQuote[] = symbols.map((symbol) => {
+    const found = data.find((item: any) => item?.symbol === symbol) || {};
+    return {
+      symbol,
+      price: Number(found.price) || 0,
+      change: Number(found.change) || 0,
+      changesPercentage: Number(found.changesPercentage) || 0,
+    };
+  });
+
+  return [markets];
+}
+
+function parseFirstRssItem(xml: string): { title?: string; pubDate?: string } | null {
+  const itemMatch = xml.match(/<item[^>]*>([\s\S]*?)<\/item>/i);
+  if (!itemMatch) return null;
+  const item = itemMatch[1];
+  const title = extractTag(item, "title");
+  const pubDate = extractTag(item, "pubDate");
+  return { title, pubDate };
+}
+
+function extractTag(source: string, tag: string): string | undefined {
+  const regex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i");
+  const match = source.match(regex);
+  if (!match) return undefined;
+  const value = match[1].replace(/<!\[CDATA\[(.*?)\]\]>/, "$1").trim();
+  return value;
+}
