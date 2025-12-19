@@ -90,10 +90,11 @@
   }
   // Visitor diagnostics
   const diagOut = $("diagOut");
+  const diagPanel = document.querySelector(".diag");
 
   async function loadDiagnostics() {
     if (!diagOut) return;
-    diagOut.textContent = "Loading /api/whoami …";
+    diagOut.textContent = "Loading /api/whoami ...\n";
     try {
       const r = await fetch("/api/whoami", { headers: { Accept: "application/json" } });
       const body = await r.text();
@@ -115,7 +116,7 @@
   }
 
   if (diagOut) {
-    document.addEventListener("DOMContentLoaded", loadDiagnostics);
-    diagOut.addEventListener("click", loadDiagnostics);
+    loadDiagnostics();
+    (diagPanel || diagOut).addEventListener("click", loadDiagnostics);
   }
 })();
