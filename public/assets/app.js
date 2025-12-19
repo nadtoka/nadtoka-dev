@@ -117,4 +117,16 @@
 
   loadDiagnostics();
   if (diagOut && diagPanel) diagPanel.addEventListener("click", loadDiagnostics);
+
+  // Avatar fallback handling
+  const avatar = document.querySelector(".avatar");
+  if (avatar) {
+    const img = avatar.querySelector(".avatar__img");
+    const markLoaded = () => avatar.classList.add("is-loaded");
+    if (img) {
+      if (img.complete && img.naturalWidth) markLoaded();
+      else img.addEventListener("load", markLoaded, { once: true });
+      img.addEventListener("error", () => avatar.classList.remove("is-loaded"));
+    }
+  }
 })();
