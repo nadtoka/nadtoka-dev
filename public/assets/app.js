@@ -151,12 +151,12 @@
         }
       }
 
-      lines.push("");
-      lines.push("Market (USD)");
       const markets = Array.isArray(parsed.markets) ? parsed.markets : null;
+      lines.push("");
       if (!markets) {
-        lines.push("- Unavailable");
+        lines.push("Market: disabled (missing API key)");
       } else {
+        lines.push("Market (USD)");
         for (const m of markets) {
           const price = typeof m?.price === "number" ? m.price.toFixed(2) : "n/a";
           const change = typeof m?.change === "number" ? m.change.toFixed(2) : "n/a";

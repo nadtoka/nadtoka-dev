@@ -49,7 +49,6 @@ export async function onRequest({ request, env }: { request: Request; env: { FMP
   };
 
   if (marketNote) payload.note = marketNote;
-  else if (!markets) payload.note = "Set FMP_API_KEY to enable quotes";
   if (errors.length) payload.note = payload.note ? `${payload.note} | ${errors.join("; ")}` : errors.join("; ");
 
   const response = new Response(JSON.stringify(payload, null, 2), {
@@ -111,24 +110,29 @@ async function fetchGoogle(): Promise<ProviderStatus> {
 }
 
 async function fetchMarkets(apiKey?: string): Promise<[MarketQuote[] | null, string?]> {
-  if (!apiKey) return [null, "Set FMP_API_KEY to enable quotes"];
+  const apiKeyTrimmed = apiKey?.trim();
+  if (!apiKeyTrimmed) return [null, "Quotes disabled: set FMP_API_KEY in Cloudflare Pages environment variables."];
 
-  const symbols = ["AMZN", "GOOGL", "MSFT"];
-  const url = `https://financialmodelingprep.com/api/v3/quote/${symbols.join(",")}?apikey=${apiKey}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Markets HTTP ${res.status}`);
-  const data = await res.json();
-  if (!Array.isArray(data)) throw new Error("Unexpected market response");
+  const symbols = ["AMZN", "GOOGL", "MSFT"] as const;
+  const urls = symbols.map((symbol) => `https://financialmodelingprep.com/stable/quote?symbol=${symbol}&apikey=${apiKeyTrimmed}`);
 
-  const markets: MarketQuote[] = symbols.map((symbol) => {
-    const found = data.find((item: any) => item?.symbol === symbol) || {};
-    return {
-      symbol,
-      price: Number(found.price) || 0,
-      change: Number(found.change) || 0,
-      changesPercentage: Number(found.changesPercentage) || 0,
-    };
+  const responses = await Promise.all(urls.map((url) => fetch(url)));
+  responses.forEach((res, idx) => {
+    if (!res.ok) throw new Error(`Markets HTTP ${res.status} for ${symbols[idx]}`);
   });
+
+  const markets = await Promise.all(
+    responses.map(async (res, idx) => {
+      const data = await res.json();
+      const entry = Array.isArray(data) ? data[0] : data;
+      return {
+        symbol: symbols[idx],
+        price: Number(entry?.price) || 0,
+        change: Number(entry?.change) || 0,
+        changesPercentage: Number(entry?.changesPercentage) || 0,
+      } satisfies MarketQuote;
+    })
+  );
 
   return [markets];
 }
