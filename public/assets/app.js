@@ -99,7 +99,7 @@
       const r = await fetch("/api/whoami", { headers: { Accept: "application/json" } });
       const body = await r.text();
       if (!r.ok) {
-        diagOut.textContent = `HTTP ${r.status} ${r.statusText}\\n${body}`;
+        diagOut.textContent = `HTTP ${r.status} ${r.statusText}\n\n${body}`;
         return;
       }
 
