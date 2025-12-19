@@ -176,6 +176,25 @@ a:hover { opacity: 0.92; }
   .hero__grid { grid-template-columns: 1fr; }
 }
 
+.hero__identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin: 16px 0 10px;
+}
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  display: block;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  object-fit: cover;
+  background: var(--card2);
+  flex-shrink: 0;
+}
+
 .eyebrow {
   display: inline-flex;
   gap: 8px;
@@ -189,12 +208,21 @@ a:hover { opacity: 0.92; }
 }
 
 .hero__title {
-  margin: 16px 0 10px;
+  margin: 0;
   font-size: 48px;
   letter-spacing: -0.6px;
   line-height: 1.05;
 }
 @media (max-width: 520px) {
+  .hero__identity {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .avatar {
+    width: 88px;
+    height: 88px;
+  }
   .hero__title { font-size: 38px; }
 }
 
