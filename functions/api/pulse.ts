@@ -1,4 +1,9 @@
-type ProviderStatus = { name: string; summary: string; updated: string | null };
+type ProviderStatus = {
+  name: string;
+  summary: string;
+  updated: string | null;
+  status: "ok" | "warn" | "down" | "unknown";
+};
 type MarketQuote = { symbol: string; price: number; change: number; changesPercentage: number };
 
 const ttlSeconds = 300;
@@ -16,19 +21,19 @@ export async function onRequest({ request, env }: { request: Request; env: { FMP
 
   const aws = await fetchAws().catch((err) => {
     errors.push(err.message || "AWS fetch failed");
-    return { name: "AWS", summary: "Latest bulletin unavailable", updated: null };
+    return withStatus("AWS", "Latest bulletin unavailable", null, "unknown");
   });
   if (aws) providers.push(aws);
 
   const google = await fetchGoogle().catch((err) => {
     errors.push(err.message || "Google Cloud fetch failed");
-    return { name: "Google Cloud", summary: "Latest incident unavailable", updated: null };
+    return withStatus("Google Cloud", "Latest bulletin unavailable", null, "unknown");
   });
   if (google) providers.push(google);
 
   const azure = await fetchAzure().catch((err) => {
     errors.push(err.message || "Azure fetch failed");
-    return { name: "Azure", summary: "Latest bulletin unavailable", updated: null };
+    return withStatus("Azure", "Latest bulletin unavailable", null, "unknown");
   });
   if (azure) providers.push(azure);
 
@@ -56,7 +61,7 @@ export async function onRequest({ request, env }: { request: Request; env: { FMP
   const response = new Response(JSON.stringify(payload, null, 2), {
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "cache-control": `public, max-age=${ttlSeconds}`,
+      "cache-control": isFresh ? "no-store" : `public, max-age=${ttlSeconds}`,
     },
   });
 
@@ -69,44 +74,42 @@ export async function onRequest({ request, env }: { request: Request; env: { FMP
 
 async function fetchAzure(): Promise<ProviderStatus> {
   const url = "https://azurestatuscdn.azureedge.net/en-us/status/feed/";
-  const { ok, status, contentType, text } = await fetchText(url);
+  const { ok, status, text } = await fetchText(url);
 
-  if (!ok) {
-    return { name: "Azure", summary: `Latest bulletin unavailable (HTTP ${status})`, updated: null };
+  if (!ok) throw new Error(`Azure status HTTP ${status}`);
+
+  let parsed: ReturnType<typeof parseRssLatest>;
+  try {
+    parsed = parseRssLatest(text);
+  } catch (err) {
+    throw new Error(`Azure parse failed: ${(err as Error)?.message || "unknown"}`);
   }
 
-  if (!isXmlLike(contentType)) {
-    return { name: "Azure", summary: "Latest bulletin unavailable (unexpected content-type)", updated: null };
-  }
+  if (!parsed) return withStatus("Azure", "No recent incidents", null, "ok");
 
-  const item = extractFirstBulletin(text);
-  const summary = normalizeTitle(item?.title);
-  return {
-    name: "Azure",
-    summary: summary || "Latest bulletin unavailable",
-    updated: item?.updated || null,
-  };
+  const summary = normalizeTitle(parsed.title) || "No recent incidents";
+  const updated = parsed.updated?.trim() || null;
+  return withStatus("Azure", summary, updated, deriveStatus(summary));
 }
 
 async function fetchAws(): Promise<ProviderStatus> {
   const url = "https://status.aws.amazon.com/rss/all.rss";
-  const { ok, status, contentType, text } = await fetchText(url);
+  const { ok, status, text } = await fetchText(url);
 
-  if (!ok) {
-    return { name: "AWS", summary: `Latest bulletin unavailable (HTTP ${status})`, updated: null };
+  if (!ok) throw new Error(`AWS status HTTP ${status}`);
+
+  let parsed: ReturnType<typeof parseRssLatest>;
+  try {
+    parsed = parseRssLatest(text);
+  } catch (err) {
+    throw new Error(`AWS parse failed: ${(err as Error)?.message || "unknown"}`);
   }
 
-  if (!isXmlLike(contentType)) {
-    return { name: "AWS", summary: "Latest bulletin unavailable (unexpected content-type)", updated: null };
-  }
+  if (!parsed) return withStatus("AWS", "No recent incidents", null, "ok");
 
-  const item = extractFirstBulletin(text);
-  const summary = normalizeTitle(item?.title);
-  return {
-    name: "AWS",
-    summary: summary || "Latest bulletin unavailable",
-    updated: item?.updated || null,
-  };
+  const summary = normalizeTitle(parsed.title) || "No recent incidents";
+  const updated = parsed.updated?.trim() || null;
+  return withStatus("AWS", summary, updated, deriveStatus(summary));
 }
 
 async function fetchGoogle(): Promise<ProviderStatus> {
@@ -116,14 +119,11 @@ async function fetchGoogle(): Promise<ProviderStatus> {
   const html = await res.text();
 
   if (html.includes("No broad severe incidents")) {
-    return { name: "Google Cloud", summary: "No broad severe incidents", updated: null };
+    return withStatus("Google Cloud", "No broad severe incidents", null, "ok");
   }
 
-  return {
-    name: "Google Cloud",
-    summary: "Active incidents reported (see status dashboard)",
-    updated: new Date().toISOString(),
-  };
+  const summary = "Active incidents reported (see status dashboard)";
+  return withStatus("Google Cloud", summary, new Date().toISOString(), deriveStatus(summary));
 }
 
 async function fetchMarkets(apiKey?: string): Promise<[MarketQuote[] | null, string?]> {
@@ -159,11 +159,6 @@ function normalizeTitle(title?: string | null): string {
   return title.replace(/\s+/g, " ").trim();
 }
 
-function isXmlLike(contentType: string): boolean {
-  const lowered = contentType.toLowerCase();
-  return lowered.includes("xml") || lowered.includes("rss") || lowered.includes("atom");
-}
-
 async function fetchText(url: string): Promise<{ ok: boolean; status: number; contentType: string; text: string }> {
   const res = await fetch(url);
   const contentType = res.headers.get("content-type")?.toLowerCase() || "";
@@ -171,34 +166,51 @@ async function fetchText(url: string): Promise<{ ok: boolean; status: number; co
   return { ok: res.ok, status: res.status, contentType, text };
 }
 
-function extractFirstBulletin(xmlText: string): { title?: string; updated?: string } | null {
-  const rssMatch = xmlText.match(/<item\b[\s\S]*?<\/item>/i);
-  if (rssMatch) {
-    const itemContent = rssMatch[0];
-    const title = extractTagContent(itemContent, "title");
-    const pubDate = extractTagContent(itemContent, "pubDate");
-    const cleanTitle = title?.trim();
-    const cleanDate = pubDate?.trim();
-    return cleanTitle || cleanDate ? { title: cleanTitle, updated: cleanDate } : null;
+function withStatus(
+  name: ProviderStatus["name"],
+  summary: ProviderStatus["summary"],
+  updated: ProviderStatus["updated"],
+  status: ProviderStatus["status"]
+): ProviderStatus {
+  return { name, summary, updated, status };
+}
+
+function deriveStatus(summary: string): ProviderStatus["status"] {
+  const lowered = summary.toLowerCase();
+  if (/(outage|service disruption|major)/i.test(lowered)) return "down";
+  if (/(investigating|degraded|elevated error|partial)/i.test(lowered)) return "warn";
+  if (/no broad severe incidents|operational|no recent incidents/i.test(lowered)) return "ok";
+  return "unknown";
+}
+
+function firstMatch(re: RegExp, s: string): string | null {
+  const m = s.match(re);
+  return m ? m[1].trim() : null;
+}
+
+function stripCdata(s: string): string {
+  return s.replace(/^<!\[CDATA\[/, "").replace(/\]\]>$/, "").trim();
+}
+
+function parseRssLatest(xml: string): { title: string | null; updated: string | null } | null {
+  const item = firstMatch(/<item\b[^>]*>([\s\S]*?)<\/item>/i, xml);
+  if (item) {
+    let title =
+      firstMatch(/<title\b[^>]*>\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*<\/title>/i, item) ??
+      firstMatch(/<title\b[^>]*>([\s\S]*?)<\/title>/i, item);
+    if (title) title = stripCdata(title);
+    const pubDate = firstMatch(/<pubDate\b[^>]*>([\s\S]*?)<\/pubDate>/i, item);
+    return { title: title ?? null, updated: pubDate };
   }
 
-  const atomMatch = xmlText.match(/<entry\b[\s\S]*?<\/entry>/i);
-  if (atomMatch) {
-    const entryContent = atomMatch[0];
-    const title = extractTagContent(entryContent, "title");
-    const updated = extractTagContent(entryContent, "updated") ?? extractTagContent(entryContent, "published");
-    const cleanTitle = title?.trim();
-    const cleanUpdated = updated?.trim();
-    return cleanTitle || cleanUpdated ? { title: cleanTitle, updated: cleanUpdated } : null;
+  const entry = firstMatch(/<entry\b[^>]*>([\s\S]*?)<\/entry>/i, xml);
+  if (entry) {
+    const title = firstMatch(/<title\b[^>]*>([\s\S]*?)<\/title>/i, entry);
+    const updated =
+      firstMatch(/<updated\b[^>]*>([\s\S]*?)<\/updated>/i, entry) ??
+      firstMatch(/<published\b[^>]*>([\s\S]*?)<\/published>/i, entry);
+    return { title: title?.trim() ?? null, updated };
   }
 
   return null;
-}
-
-function extractTagContent(block: string, tagName: string): string | undefined {
-  const match = block.match(
-    new RegExp(`<${tagName}[^>]*>\\s*(?:<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>|([\\s\\S]*?))\\s*<\\/${tagName}>`, "i")
-  );
-  if (!match) return undefined;
-  return match[1] ?? match[2];
 }

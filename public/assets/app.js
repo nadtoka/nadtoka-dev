@@ -145,6 +145,18 @@
       if (providers.length === 0) lines.push("- Unavailable");
       else {
         const providerOrder = ["AWS", "Google Cloud", "Azure"];
+        const iconForStatus = (status) => {
+          switch (status) {
+            case "ok":
+              return "✅";
+            case "warn":
+              return "⚠️";
+            case "down":
+              return "❌";
+            default:
+              return "⬜";
+          }
+        };
         const ordered = providerOrder
           .map((name) => providers.find((p) => p?.name === name))
           .filter(Boolean);
@@ -153,7 +165,8 @@
           const summary = p?.summary || "Unavailable";
           const updated =
             typeof p?.updated === "string" && p.updated.trim() ? ` (${p.updated})` : "";
-          lines.push(`- ${p?.name || "Provider"}: ${summary}${updated}`);
+          const icon = iconForStatus(p?.status);
+          lines.push(`- ${icon} ${p?.name || "Provider"}: ${summary}${updated}`);
         }
       }
 
