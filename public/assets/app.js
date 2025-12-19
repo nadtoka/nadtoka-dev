@@ -119,7 +119,7 @@
   if (diagOut && diagPanel) diagPanel.addEventListener("click", loadDiagnostics);
 
   // Avatar fallback handling
-  const avatar = document.querySelector(".avatar");
+  const avatar = document.querySelector(".avatar[data-initials]");
   if (avatar) {
     const img = avatar.querySelector(".avatar__img");
     const markLoaded = () => avatar.classList.add("is-loaded");
