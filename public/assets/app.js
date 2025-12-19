@@ -89,19 +89,33 @@
     });
   }
   // Visitor diagnostics
-  const loadDiag = $("loadDiag");
   const diagOut = $("diagOut");
 
-  if (loadDiag && diagOut) {
-    loadDiag.addEventListener("click", async () => {
-      diagOut.textContent = "Running...\n";
-      try {
-        const r = await fetch("/api/whoami", { headers: { "Accept": "application/json" } });
-        const data = await r.json();
-        diagOut.textContent = JSON.stringify(data, null, 2);
-      } catch (e) {
-        diagOut.textContent = "Failed to load diagnostics.";
+  async function loadDiagnostics() {
+    if (!diagOut) return;
+    diagOut.textContent = "Loading /api/whoami …";
+    try {
+      const r = await fetch("/api/whoami", { headers: { Accept: "application/json" } });
+      const body = await r.text();
+      if (!r.ok) {
+        diagOut.textContent = `HTTP ${r.status} ${r.statusText}\\n${body}`;
+        return;
       }
-    });
+
+      try {
+        const parsed = JSON.parse(body);
+        diagOut.textContent = JSON.stringify(parsed, null, 2);
+      } catch (_) {
+        diagOut.textContent = body;
+      }
+    } catch (_) {
+      diagOut.textContent =
+        "Failed to load diagnostics. Cloudflare Pages Functions may be unavailable, the path may be wrong, or the network request was blocked.";
+    }
+  }
+
+  if (diagOut) {
+    document.addEventListener("DOMContentLoaded", loadDiagnostics);
+    diagOut.addEventListener("click", loadDiagnostics);
   }
 })();
