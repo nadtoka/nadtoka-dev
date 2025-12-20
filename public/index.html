@@ -329,6 +329,17 @@ x-frame-options: DENY</code></pre>
           </article>
 
           <article class="card">
+            <h3>Centralized Identity &amp; Access (LDAP + Replication)</h3>
+            <p>Single source of truth for internal authentication across cloud and office infrastructure.</p>
+            <ul class="list">
+              <li>Primary LDAP in cloud + office replica for local availability</li>
+              <li>LDAP auth for office Wi-Fi and Linux workstation logins</li>
+              <li>LDAP auth for HashiCorp Vault and SSH access to dev servers</li>
+              <li>Outcome: consistent identity management, fewer local accounts, simpler governance</li>
+            </ul>
+          </article>
+
+          <article class="card">
             <h3>Self-hosted app on Kubernetes</h3>
             <p>ActiveCollab in Kubernetes with MySQL + Elasticsearch + PHP-FPM + NGINX.</p>
             <ul class="list">
