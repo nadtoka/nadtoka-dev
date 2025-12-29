@@ -2,10 +2,15 @@ export async function onRequest({ request }: { request: Request }) {
   const h = request.headers;
   const pick = (name: string) => h.get(name) ?? undefined;
 
+  const cfRay = pick("cf-ray");
+  // Cloudflare colo is often present as the suffix of cf-ray: "<id>-<COLO>"
+  const coloFromRay = cfRay?.split("-").pop();
+
   // Expose only a SAFE subset (no cookies, no auth, no raw IP)
   const cf = {
-    ray: pick("cf-ray"),
-    colo: pick("cf-colo"),
+    ray: cfRay,
+    // Prefer derived COLO; optional header fallback if it ever exists in this environment
+    colo: coloFromRay ?? pick("cf-colo"),
     country: pick("cf-ipcountry"),
     visitor: pick("cf-visitor"),
   };
