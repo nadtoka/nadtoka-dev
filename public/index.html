@@ -208,6 +208,17 @@ x-frame-options: DENY</code></pre>
             </ul>
           </article>
 
+          <article class="card">
+            <h3>AI-assisted DevOps workflows</h3>
+            <p>Using LLM copilots to speed up delivery while keeping changes reviewable and safe.</p>
+            <ul class="list">
+              <li>Tools: ChatGPT (incl. Codex), Google Gemini</li>
+              <li>Use cases: troubleshooting, config drafts, PR summaries, runbook outlines</li>
+              <li>Safety: no secrets in prompts; review-before-apply; minimal context sharing</li>
+              <li>Local lab: Ollama (Llama 3.x 8B Instruct, GGUF Q4/Q5) on office server (CPU/RAM)</li>
+            </ul>
+          </article>
+
           <article class="card card--wide">
             <h3>Containers (pragmatic)</h3>
             <p>Docker/Swarm/Kubernetes where it actually helps your workload.</p>
@@ -335,7 +346,7 @@ x-frame-options: DENY</code></pre>
               <li>Primary LDAP in cloud + office replica for local availability</li>
               <li>LDAP auth for office Wi-Fi and Linux workstation logins</li>
               <li>LDAP auth for HashiCorp Vault and SSH access to dev servers</li>
-              <li>Outcome: consistent identity management, fewer local accounts, simpler governance</li>
+              <li>Outcome: centralized access control and cleaner offboarding</li>
             </ul>
           </article>
 
@@ -353,7 +364,7 @@ x-frame-options: DENY</code></pre>
             <h3>Office Virtualization Platform (Proxmox VE)</h3>
             <p>Built a secure virtualization baseline for an office server.</p>
             <ul class="list">
-              <li>ZFS storage + VLAN-aware networking</li>
+              <li>Storage + networking baseline (segmentation, templates)</li>
               <li>RBAC roles and least-privilege access</li>
               <li>Multi-VM dev/test platform with templates</li>
               <li>Result: scalable layout and simpler admin</li>
@@ -364,7 +375,7 @@ x-frame-options: DENY</code></pre>
             <h3>On-prem Observability Stack (Prometheus + Grafana + Alertmanager)</h3>
             <p>Monitoring for isolated networks with actionable dashboards and alert routing.</p>
             <ul class="list">
-              <li>Deployed across 5 servers</li>
+              <li>Coverage across 5 servers (LB, DB, core, maintenance, services)</li>
               <li>IaC via Terraform + repeatable builds (Chef Kitchen)</li>
               <li>Dashboards for Node Exporter, Blackbox, cAdvisor, PostgreSQL</li>
               <li>Alert routing with clear ownership</li>
@@ -376,7 +387,7 @@ x-frame-options: DENY</code></pre>
             <h3>Cloud Security Gateway (pfSense + VPN + Reverse Proxy)</h3>
             <p>Hardened perimeter for cloud workloads.</p>
             <ul class="list">
-              <li>VPN-only administrative access with MFA</li>
+              <li>VPN-only administrative access with restricted policies</li>
               <li>HAProxy TLS termination and routing policies</li>
               <li>IDS/IPS baseline with tuned rules</li>
               <li>Result: reduced attack surface and safer access</li>
