@@ -97,17 +97,10 @@
               <span class="dot" aria-hidden="true"></span>
               <span class="dot" aria-hidden="true"></span>
               <span class="dot" aria-hidden="true"></span>
-              <span class="terminal__title">security-check</span>
+              <span class="terminal__title">Security &amp; Reliability</span>
             </div>
 
             <div class="terminal__body">
-              <pre class="terminal__pre"><code>$ curl -I https://nadtoka.dev
-HTTP/2 200
-strict-transport-security: max-age=31536000
-content-security-policy: default-src 'self' ...
-x-content-type-options: nosniff
-x-frame-options: DENY</code></pre>
-
               <div class="diag">
                 <div class="diag__head">
                   <div>
@@ -117,6 +110,22 @@ x-frame-options: DENY</code></pre>
                 </div>
 
                 <pre class="terminal__pre" id="pulseOut"><code>Loading…</code></pre>
+              </div>
+
+              <div class="diag">
+                <div class="diag__head">
+                  <div>
+                    <div class="diag__title">Security headers</div>
+                    <div class="diag__sub muted">Quick snapshot of HTTPS response headers.</div>
+                  </div>
+                </div>
+
+                <pre class="terminal__pre"><code>$ curl -I https://nadtoka.dev
+HTTP/2 200
+strict-transport-security: max-age=31536000
+content-security-policy: default-src 'self' ...
+x-content-type-options: nosniff
+x-frame-options: DENY</code></pre>
               </div>
 
               <div class="diag">
