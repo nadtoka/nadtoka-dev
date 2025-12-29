@@ -90,8 +90,9 @@
   }
   // Visitor diagnostics
   const diagOut = $("diagOut");
-  const diagPanel = document.querySelector(".diag");
   const pulseOut = $("pulseOut");
+  const diagPanel = diagOut?.closest(".diag");
+  const pulsePanel = pulseOut?.closest(".diag");
 
   async function loadDiagnostics() {
     if (!diagOut) return;
@@ -115,9 +116,6 @@
         "Failed to load diagnostics. Cloudflare Pages Functions may be unavailable, the path may be wrong, or the network request was blocked.";
     }
   }
-
-  loadDiagnostics();
-  if (diagOut && diagPanel) diagPanel.addEventListener("click", loadDiagnostics);
 
   // Ops pulse
   async function loadPulse() {
@@ -198,6 +196,10 @@
   }
 
   loadPulse();
+  if (pulseOut && pulsePanel) pulsePanel.addEventListener("click", loadPulse);
+
+  loadDiagnostics();
+  if (diagOut && diagPanel) diagPanel.addEventListener("click", loadDiagnostics);
 
   // Avatar fallback handling
   const avatar = document.querySelector(".avatar[data-initials]");
