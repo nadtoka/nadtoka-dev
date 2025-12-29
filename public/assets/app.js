@@ -94,26 +94,75 @@
   const diagPanel = diagOut?.closest(".diag");
   const pulsePanel = pulseOut?.closest(".diag");
 
+  function shortUA(ua) {
+    if (!ua) return "-";
+    // Викидаємо дужки з OS/деталями, щоб не роздувало
+    const cleaned = String(ua).replace(/\([^)]*\)\s*/g, "");
+    return cleaned.length > 80 ? cleaned.slice(0, 80) + "…" : cleaned;
+  }
+
+  function formatDiagSummary(d) {
+    const lines = [];
+    lines.push(`time: ${d?.time || "-"}`);
+    lines.push(`country: ${d?.cf?.country || "-"}`);
+    lines.push(`ray: ${d?.cf?.ray || "-"}`);
+    lines.push(`colo: ${d?.cf?.colo || "-"}`);
+    lines.push(`lang: ${d?.browser?.acceptLanguage || "-"}`);
+    lines.push(`ua: ${shortUA(d?.browser?.userAgent)}`);
+    lines.push(`note: ${d?.note || "Read-only. No storage."}`);
+    lines.push("");
+    lines.push("(click to toggle raw)");
+    return lines.join("\n");
+  }
+
+  function toggleDiagView() {
+    if (!diagOut) return;
+    const raw = diagOut.dataset.raw;
+    if (!raw) return;
+
+    const mode = diagOut.dataset.mode || "summary";
+    if (mode === "summary") {
+      diagOut.dataset.mode = "raw";
+      diagOut.textContent = raw;
+    } else {
+      diagOut.dataset.mode = "summary";
+      try {
+        const parsed = JSON.parse(raw);
+        diagOut.textContent = formatDiagSummary(parsed);
+      } catch (_) {
+        diagOut.textContent = raw;
+      }
+    }
+  }
+
   async function loadDiagnostics() {
     if (!diagOut) return;
     diagOut.textContent = "Loading /api/whoami ...\n";
+    diagOut.dataset.mode = "summary";
     try {
       const r = await fetch("/api/whoami", { headers: { Accept: "application/json" } });
       const body = await r.text();
+
       if (!r.ok) {
         diagOut.textContent = `HTTP ${r.status} ${r.statusText}\n\n${body}`;
+        diagOut.dataset.raw = "";
         return;
       }
 
+      // save raw for toggle
+      diagOut.dataset.raw = body;
+
       try {
         const parsed = JSON.parse(body);
-        diagOut.textContent = JSON.stringify(parsed, null, 2);
+        diagOut.textContent = formatDiagSummary(parsed);
       } catch (_) {
+        // якщо раптом не JSON
         diagOut.textContent = body;
       }
     } catch (_) {
       diagOut.textContent =
         "Failed to load diagnostics. Cloudflare Pages Functions may be unavailable, the path may be wrong, or the network request was blocked.";
+      diagOut.dataset.raw = "";
     }
   }
 
@@ -199,7 +248,7 @@
   if (pulseOut && pulsePanel) pulsePanel.addEventListener("click", loadPulse);
 
   loadDiagnostics();
-  if (diagOut && diagPanel) diagPanel.addEventListener("click", loadDiagnostics);
+  if (diagOut && diagPanel) diagPanel.addEventListener("click", toggleDiagView);
 
   // Avatar fallback handling
   const avatar = document.querySelector(".avatar[data-initials]");
