@@ -98,20 +98,28 @@
     if (!ua) return "-";
     // Викидаємо дужки з OS/деталями, щоб не роздувало
     const cleaned = String(ua).replace(/\([^)]*\)\s*/g, "");
-    return cleaned.length > 80 ? cleaned.slice(0, 80) + "…" : cleaned;
+    return cleaned.length > 90 ? cleaned.slice(0, 90) + "…" : cleaned;
   }
 
-  function formatDiagSummary(d) {
+  function deriveColo(d) {
+    const explicit = d?.cf?.colo;
+    if (explicit) return explicit;
+    const ray = d?.cf?.ray;
+    if (!ray || typeof ray !== "string") return "-";
+    const lastDash = ray.lastIndexOf("-");
+    if (lastDash === -1 || lastDash === ray.length - 1) return "-";
+    return ray.slice(lastDash + 1);
+  }
+
+  function renderDiagPreview(d) {
     const lines = [];
     lines.push(`time: ${d?.time || "-"}`);
     lines.push(`country: ${d?.cf?.country || "-"}`);
-    lines.push(`ray: ${d?.cf?.ray || "-"}`);
-    lines.push(`colo: ${d?.cf?.colo || "-"}`);
+    lines.push(`colo: ${deriveColo(d)}`);
     lines.push(`lang: ${d?.browser?.acceptLanguage || "-"}`);
     lines.push(`ua: ${shortUA(d?.browser?.userAgent)}`);
-    lines.push(`note: ${d?.note || "Read-only. No storage."}`);
     lines.push("");
-    lines.push("(click to toggle raw)");
+    lines.push("(click to expand)");
     return lines.join("\n");
   }
 
@@ -120,25 +128,26 @@
     const raw = diagOut.dataset.raw;
     if (!raw) return;
 
-    const mode = diagOut.dataset.mode || "summary";
-    if (mode === "summary") {
+    const mode = diagOut.dataset.mode || "preview";
+    if (mode === "preview") {
       diagOut.dataset.mode = "raw";
       diagOut.textContent = raw;
-    } else {
-      diagOut.dataset.mode = "summary";
-      try {
-        const parsed = JSON.parse(raw);
-        diagOut.textContent = formatDiagSummary(parsed);
-      } catch (_) {
-        diagOut.textContent = raw;
-      }
+      return;
+    }
+
+    diagOut.dataset.mode = "preview";
+    try {
+      const parsed = JSON.parse(raw);
+      diagOut.textContent = renderDiagPreview(parsed);
+    } catch (_) {
+      diagOut.textContent = raw;
     }
   }
 
   async function loadDiagnostics() {
     if (!diagOut) return;
     diagOut.textContent = "Loading /api/whoami ...\n";
-    diagOut.dataset.mode = "summary";
+    diagOut.dataset.mode = "preview";
     try {
       const r = await fetch("/api/whoami", { headers: { Accept: "application/json" } });
       const body = await r.text();
@@ -154,7 +163,7 @@
 
       try {
         const parsed = JSON.parse(body);
-        diagOut.textContent = formatDiagSummary(parsed);
+        diagOut.textContent = renderDiagPreview(parsed);
       } catch (_) {
         // якщо раптом не JSON
         diagOut.textContent = body;
