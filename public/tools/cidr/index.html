@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CIDR Calculator • nadtoka.dev</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0;">
+      <a href="/tools/" class="btn secondary">← <span data-i18n="back">Back</span></a>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="opacity:.75;font-size:14px;" data-i18n="language">Language</span>
+        <button id="lang-uk" class="btn secondary" type="button">UA</button>
+        <button id="lang-en" class="btn secondary" type="button">EN</button>
+      </div>
+    </div>
+
+    <section class="card" style="padding:18px;">
+      <h1 style="margin:0 0 6px 0;">🧮 <span data-i18n="title">CIDR Calculator</span></h1>
+      <p style="margin:0 0 16px 0;opacity:.8;" data-i18n="subtitle">IPv4 subnet breakdown (offline).</p>
+
+      <div class="card" style="padding:14px;max-width:980px;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+          <input id="cidr" type="text" value="10.0.0.0/24" spellcheck="false"
+            style="flex:1;min-width:240px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:inherit;font-family:ui-monospace, monospace;" />
+          <button id="calc" class="btn" type="button" data-i18n="calc">Calculate</button>
+          <button id="copy" class="btn secondary" type="button" data-i18n="copy">Copy</button>
+        </div>
+
+        <div id="error" style="margin:6px 0 12px 0;font-size:13px;opacity:.85;"></div>
+
+        <div class="card" style="padding:14px;">
+          <pre id="out" style="margin:0;white-space:pre-wrap;font-family:ui-monospace, monospace;"></pre>
+        </div>
+
+        <div style="margin-top:10px;font-size:13px;opacity:.75;" data-i18n="note">
+          Usable hosts exclude network and broadcast (except /31 and /32 have special rules).
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/tools-cidr.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Encoders • nadtoka.dev</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0;">
+      <a href="/tools/" class="btn secondary">← <span data-i18n="back">Back</span></a>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="opacity:.75;font-size:14px;" data-i18n="language">Language</span>
+        <button id="lang-uk" class="btn secondary" type="button">UA</button>
+        <button id="lang-en" class="btn secondary" type="button">EN</button>
+      </div>
+    </div>
+
+    <section class="card" style="padding:18px;">
+      <h1 style="margin:0 0 6px 0;">🔁 <span data-i18n="title">Encoders</span></h1>
+      <p style="margin:0 0 16px 0;opacity:.8;" data-i18n="subtitle">Everything runs locally in your browser.</p>
+
+      <div class="card" style="padding:14px;max-width:980px;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+          <select id="mode" style="padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:inherit;">
+            <option value="b64enc">Base64 encode</option>
+            <option value="b64dec">Base64 decode</option>
+            <option value="b64urlenc">Base64URL encode</option>
+            <option value="b64urldec">Base64URL decode</option>
+            <option value="urlenc">URL encode</option>
+            <option value="urldec">URL decode</option>
+            <option value="jsonpretty">JSON pretty</option>
+            <option value="jsonmin">JSON minify</option>
+          </select>
+
+          <button id="run" class="btn" type="button" data-i18n="run">Run</button>
+          <button id="swap" class="btn secondary" type="button" data-i18n="swap">Swap</button>
+          <button id="copyOut" class="btn secondary" type="button" data-i18n="copy">Copy output</button>
+          <button id="clear" class="btn secondary" type="button" data-i18n="clear">Clear</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr;gap:10px;">
+          <textarea id="in" rows="8" placeholder="Input..."
+            style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:inherit;font-family:ui-monospace, monospace;"></textarea>
+          <textarea id="out" rows="8" placeholder="Output..." readonly
+            style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.18);color:inherit;font-family:ui-monospace, monospace;"></textarea>
+        </div>
+
+        <div id="msg" style="margin-top:10px;font-size:13px;opacity:.75;"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/tools-encoders.js" defer></script>
+</body>
+</html>
