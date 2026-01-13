@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>URL Inspector • nadtoka.dev</title>
+  <meta name="description" content="URL inspector + curl builder (offline parsing)." />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+
+<body>
+  <main class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0;">
+      <a href="/tools/" class="btn secondary">← <span data-i18n="back">Back</span></a>
+
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="opacity:.75;font-size:14px;" data-i18n="language">Language</span>
+        <button id="lang-uk" class="btn secondary" type="button">UA</button>
+        <button id="lang-en" class="btn secondary" type="button">EN</button>
+      </div>
+    </div>
+
+    <section class="card" style="padding:18px;">
+      <h1 style="margin:0 0 6px 0;">🔎 <span data-i18n="title">URL Inspector</span></h1>
+      <p style="margin:0 0 16px 0;opacity:.8;" data-i18n="subtitle">
+        Parse, normalize and generate useful curl commands. Runs locally.
+      </p>
+
+      <div class="card" style="padding:14px;max-width:980px;">
+        <label style="display:block;font-size:14px;opacity:.8;margin-bottom:6px;" data-i18n="inputLabel">URL</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <input id="url" type="text" spellcheck="false" value="https://nadtoka.dev/?utm_source=test&b=2&a=1"
+            style="flex:1;min-width:280px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:inherit;font-family:ui-monospace, monospace;" />
+          <button id="analyze" class="btn" type="button" data-i18n="analyze">Analyze</button>
+          <button id="copyNorm" class="btn secondary" type="button" data-i18n="copyNormalized">Copy normalized</button>
+          <button id="clear" class="btn secondary" type="button" data-i18n="clear">Clear</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px;">
+          <div class="card" style="padding:14px;">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+              <div style="font-size:14px;opacity:.8;" data-i18n="options">Options</div>
+              <div style="font-size:13px;opacity:.75;" id="msg"></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px;">
+              <label style="display:flex;gap:10px;align-items:center;">
+                <input id="stripUtm" type="checkbox" checked />
+                <span data-i18n="stripUtm">Strip UTM parameters</span>
+              </label>
+              <label style="display:flex;gap:10px;align-items:center;">
+                <input id="sortQuery" type="checkbox" checked />
+                <span data-i18n="sortQuery">Sort query params</span>
+              </label>
+              <label style="display:flex;gap:10px;align-items:center;">
+                <input id="decode" type="checkbox" />
+                <span data-i18n="decode">Decode %xx in output</span>
+              </label>
+              <label style="display:flex;gap:10px;align-items:center;">
+                <input id="dropHash" type="checkbox" />
+                <span data-i18n="dropHash">Drop #fragment</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="card" style="padding:14px;">
+            <div style="font-size:14px;opacity:.8;margin-bottom:8px;" data-i18n="normalized">Normalized URL</div>
+            <textarea id="normalized" rows="3" readonly
+              style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.18);color:inherit;font-family:ui-monospace, monospace;"></textarea>
+          </div>
+
+          <div class="card" style="padding:14px;">
+            <div style="font-size:14px;opacity:.8;margin-bottom:8px;" data-i18n="breakdown">Breakdown</div>
+            <pre id="breakdown" style="margin:0;white-space:pre-wrap;font-family:ui-monospace, monospace;"></pre>
+          </div>
+
+          <div class="card" style="padding:14px;">
+            <div style="font-size:14px;opacity:.8;margin-bottom:8px;" data-i18n="curl">Generated curl commands</div>
+            <textarea id="curlOut" rows="7" readonly
+              style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.18);color:inherit;font-family:ui-monospace, monospace;"></textarea>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+              <button id="copyCurl" class="btn secondary" type="button" data-i18n="copyCurl">Copy curl</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;font-size:13px;opacity:.75;" data-i18n="note">
+        Note: DNS lookups and raw TCP port checks are not possible from the browser. This tool focuses on parsing and command generation.
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/tools-url.js" defer></script>
+</body>
+</html>
