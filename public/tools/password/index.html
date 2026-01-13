@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Password Generator • nadtoka.dev</title>
+  <meta name="description" content="Offline, crypto-secure password generator." />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+
+<body>
+  <main class="container">
+    <div class="nav-row" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0;">
+      <a href="/" class="btn secondary">← <span data-i18n="back">Back</span></a>
+
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="opacity:.75;font-size:14px;" data-i18n="language">Language</span>
+        <div class="lang-switch" style="display:flex;gap:8px;">
+          <button id="lang-uk" class="btn secondary" type="button">UA</button>
+          <button id="lang-en" class="btn secondary" type="button">EN</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="card" style="padding:18px;">
+      <h1 style="margin:0 0 6px 0;">🔐 <span data-i18n="title">Password Generator</span></h1>
+      <p style="margin:0 0 16px 0;opacity:.8;" data-i18n="subtitle">
+        Crypto-secure randomness (Web Crypto). Generated locally in your browser.
+      </p>
+
+      <div class="grid" style="display:grid;grid-template-columns:1fr;gap:14px;max-width:780px;">
+        <div class="card" style="padding:14px;">
+          <label style="display:block;font-size:14px;opacity:.8;margin-bottom:6px;" data-i18n="resultLabel">Generated password</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <input id="pw-output" type="text" readonly
+                   style="flex:1;min-width:260px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:inherit;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono','Courier New', monospace;"
+                   aria-label="password output" />
+            <button id="copy-btn" class="btn secondary" type="button" data-i18n="copy">Copy</button>
+            <button id="gen-btn" class="btn" type="button" data-i18n="generate">Generate</button>
+          </div>
+          <div id="toast" style="margin-top:10px;font-size:13px;opacity:.75;"></div>
+        </div>
+
+        <div class="card" style="padding:14px;">
+          <div style="display:grid;grid-template-columns:1fr;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+              <div>
+                <div style="font-size:14px;opacity:.8;" data-i18n="length">Length</div>
+                <div style="font-family:ui-monospace, monospace;font-size:18px;">
+                  <span id="len-val">24</span>
+                </div>
+              </div>
+              <input id="len" type="range" min="8" max="64" value="24" />
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
+              <label style="display:flex;gap:10px;align-items:center;">
+                <input id="lower" type="checkbox" checked />
+                <span data-i18n="lower">Lowercase (a-z)</span>
+              </label>
+              <label style="display:flex;gap:10px;align-items:center;">
+                <input id="upper" type="checkbox" checked />
+                <span data-i18n="upper">Uppercase (A-Z)</span>
+              </label>
+              <label style="display:flex;gap:10px;align-items:center;">
+                <input id="digits" type="checkbox" checked />
+                <span data-i18n="digits">Digits (0-9)</span>
+              </label>
+              <label style="display:flex;gap:10px;align-items:center;">
+                <input id="symbols" type="checkbox" checked />
+                <span data-i18n="symbols">Symbols</span>
+              </label>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px;">
+              <label style="display:flex;gap:10px;align-items:center;">
+                <input id="no-amb" type="checkbox" checked />
+                <span data-i18n="noAmb">Exclude ambiguous (O/0, l/1, I)</span>
+              </label>
+              <label style="display:flex;gap:10px;align-items:center;">
+                <input id="no-sim" type="checkbox" />
+                <span data-i18n="noSim">Exclude similar ({}[]()/\`~,;:.)</span>
+              </label>
+            </div>
+
+            <div style="margin-top:8px;font-size:13px;opacity:.75;" data-i18n="note">
+              Tip: use 16–24 chars for strong passwords. Prefer a password manager.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/password.js" defer></script>
+</body>
+</html>
