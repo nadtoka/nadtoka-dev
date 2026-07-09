@@ -163,14 +163,13 @@ x-frame-options: DENY</code></pre>
 
         <div class="cards">
           <article class="card">
-            <h3>CI/CD & Release Engineering</h3>
-            <p>Fast, reliable releases with predictable pipelines.</p>
+            <h3>CI/CD &amp; Release Engineering</h3>
+            <p>Fast, reliable releases with predictable pipelines and secure container supply chains.</p>
             <ul class="list">
-              <li>GitHub Actions / GitLab CI pipelines (build, test, deploy)</li>
-              <li>Reusable templates, caching &amp; parallelism</li>
-              <li>Runners setup &amp; troubleshooting</li>
-              <li>Secure delivery: least-privilege + secrets hygiene</li>
-              <li>Established a secure container management workflow with a local Harbor registry, including automated replication of production images to AWS ECR</li>
+              <li>GitHub Actions / GitLab CI pipelines (build, test, deploy).</li>
+              <li>Reusable templates, intelligent caching &amp; parallelism.</li>
+              <li>Self-hosted runners setup, scaling, and troubleshooting.</li>
+              <li>Secure delivery: least-privilege configurations + strict secrets hygiene.</li>
             </ul>
           </article>
 
@@ -178,10 +177,10 @@ x-frame-options: DENY</code></pre>
             <h3>Infrastructure as Code (Terraform)</h3>
             <p>Reproducible environments with safe, reviewable changes.</p>
             <ul class="list">
-              <li>Terraform modules, remote state, environment patterns</li>
-              <li>Provisioning automation: plan → review → apply</li>
-              <li>Drift control and lifecycle governance</li>
-              <li>Networking/IAM/security group baseline</li>
+              <li>Terraform modules, remote state management, and environment isolation patterns.</li>
+              <li>Provisioning automation: strict plan → review → apply workflows.</li>
+              <li>Drift control, state recovery, and infrastructure lifecycle governance.</li>
+              <li>Network segregation, IAM roles, and security group baselines.</li>
             </ul>
           </article>
 
@@ -189,65 +188,64 @@ x-frame-options: DENY</code></pre>
             <h3>Managed Infrastructure (Cloud + Hybrid)</h3>
             <p>Ongoing maintenance and production stability for small-to-mid projects.</p>
             <ul class="list">
-              <li>AWS / GCP / OpenStack-based environments</li>
-              <li>Hybrid cloud + office/on-prem with clear runbooks</li>
-              <li>Upgrades, patching, capacity, incident response</li>
-              <li>Predictable changes, less drama</li>
+              <li>AWS / GCP / OpenStack (Open Telekom Cloud) production environments.</li>
+              <li>Hybrid datacenter-cloud setups matching local office/on-prem nodes with clear runbooks.</li>
+              <li>OS upgrades, kernel patching, capacity management, and incident response.</li>
+              <li>Predictable infrastructure updates with minimal production drama.</li>
             </ul>
           </article>
 
           <article class="card">
-            <h3>Observability (VictoriaMetrics (High-throughput observability) / Grafana / Loki)</h3>
-            <p>Actionable dashboards and alerts (signal &gt; noise).</p>
+            <h3>Observability (VictoriaMetrics &amp; Grafana)</h3>
+            <p>Actionable metrics, dashboards, and alert routing where signal outweighs noise.</p>
             <ul class="list">
-              <li>Metrics, dashboards, alert rules</li>
-              <li>SLO-aware alerting (pragmatic)</li>
-              <li>Log aggregation when needed</li>
-              <li>Runbooks so incidents become boring</li>
+              <li>High-throughput time-series storage using VictoriaMetrics as a drop-in Prometheus replacement.</li>
+              <li>Custom Grafana dashboards pre-provisioned for Node Exporter, cAdvisor, and DB engines.</li>
+              <li>SLO-aware, pragmatic alerting via Alertmanager (integrated with DevOps mail/Telegram).</li>
+              <li>Log aggregation using Loki paired with explicit disaster triage playbooks.</li>
             </ul>
           </article>
 
           <article class="card">
-            <h3>Security & Networking Baseline</h3>
-            <p>Reasonable security by default — without blocking delivery.</p>
+            <h3>Security &amp; Networking Baseline</h3>
+            <p>Reasonable security by default — securing assets without blocking active delivery.</p>
             <ul class="list">
-              <li>IAM/RBAC review, access governance</li>
-              <li>VPN/IPsec, secure gateways (pfSense), HAProxy routing</li>
-              <li>TLS automation and safe defaults</li>
-              <li>Secrets patterns (Vault when it makes sense)</li>
+              <li>IAM / RBAC audit, resource governance, and access control policies.</li>
+              <li>Secure gateways (pfSense), HAProxy-based routing, and automated TLS/SSL.</li>
+              <li>VPN / IPsec site-to-site tunnels interconnecting multi-cloud and office networks.</li>
+              <li>Centralized access control patterns (LDAP integration and HashiCorp Vault implementation).</li>
             </ul>
           </article>
 
           <article class="card">
-            <h3>Backups & Disaster Recovery</h3>
-            <p>No-surprises recovery procedures.</p>
+            <h3>Backups &amp; Disaster Recovery</h3>
+            <p>No-surprises recovery procedures for core applications and data layers.</p>
             <ul class="list">
-              <li>Backup strategy (S3/restic/Proxmox Backup)</li>
-              <li>Restore tests, RPO/RTO planning</li>
-              <li>DR playbooks and periodic drills</li>
-              <li>Simple, documented recovery paths</li>
+              <li>Multi-tiered storage backup architecture (AWS S3, restic, Proxmox Backup Server).</li>
+              <li>Point-in-time recovery strategy and database replication patterns.</li>
+              <li>Documented DR playbooks, recovery path drills, and clear RPO/RTO planning.</li>
             </ul>
           </article>
 
           <article class="card">
-            <h3>AI-assisted DevOps workflows</h3>
-            <p>Using LLM copilots to speed up delivery while keeping changes reviewable and safe.</p>
+            <h3>MLOps &amp; Local AI Infrastructure</h3>
+            <p>Deploying, monitoring, and managing the full lifecycle of open-source models and pipelines.</p>
             <ul class="list">
-              <li>Tools: ChatGPT (incl. Codex), Google Gemini</li>
-              <li>Use cases: troubleshooting, config drafts, PR summaries, runbook outlines</li>
-              <li>Safety: no secrets in prompts; review-before-apply; minimal context sharing</li>
-              <li>Local lab: Ollama (Llama 3.x 8B Instruct, GGUF Q4/Q5) on office server (CPU/RAM)</li>
+              <li>Continuous training (CT) infrastructure, feature engineering engines, and automated MLOps pipelines.</li>
+              <li>Private, secure local LLM inference setups (Ollama, LM Studio) on bare-metal or hybrid mini PC hardware.</li>
+              <li>Automated dataset and model synchronization using the Hugging Face Hub registry.</li>
+              <li>Testing and deployment configurations for models like Llama 3.x, Qwen, and DeepSeek-R1.</li>
             </ul>
           </article>
 
           <article class="card card--wide">
             <h3>Containers (pragmatic)</h3>
-            <p>Docker/Swarm/Kubernetes and Harbor where it actually helps your workload.</p>
+            <p>Docker, Swarm, or Kubernetes — selected strictly based on your actual workload complexity and budget limitations.</p>
             <ul class="list">
-              <li>Containerization, Compose/Swarm operations</li>
-              <li>Practical Kubernetes deployments (when needed)</li>
-              <li>Registry: Harbor for secure image management and replication</li>
-              <li>GitOps delivery (optional)</li>
+              <li>Advanced containerization, multi-stage builds, and Docker Compose/Swarm architecture.</li>
+              <li>Practical Kubernetes platform deployments when structural scaling or high availability demands it.</li>
+              <li>Secure container tracking with local Harbor registry deployments and automated replication to cloud registries (AWS ECR).</li>
+              <li>Automated GitOps continuous delivery workflows utilizing ArgoCD and production Helm charts.</li>
             </ul>
           </article>
         </div>
