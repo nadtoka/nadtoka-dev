@@ -11,7 +11,7 @@ const ttlSeconds = 300;
 export async function onRequest({ request, env }: { request: Request; env: { FMP_API_KEY?: string } }) {
   const url = new URL(request.url);
   const isFresh = url.searchParams.get("fresh") === "1";
-  const cache = caches.default;
+  const cache = (caches as any).default;
   const cacheKey = new Request(url.toString(), request);
   const cached = isFresh ? null : await cache.match(cacheKey);
   if (cached) return cached;
@@ -74,9 +74,9 @@ export async function onRequest({ request, env }: { request: Request; env: { FMP
 
 async function fetchAzure(): Promise<ProviderStatus> {
   const url = "https://azurestatuscdn.azureedge.net/en-us/status/feed/";
-  const { ok, status, text } = await fetchText(url);
+  const { ok, status: httpStatus, text } = await fetchText(url);
 
-  if (!ok) throw new Error(`Azure status HTTP ${status}`);
+  if (!ok) throw new Error(`Azure status HTTP ${httpStatus}`);
 
   let parsed: ReturnType<typeof parseRssLatest>;
   try {
@@ -107,9 +107,9 @@ async function fetchAzure(): Promise<ProviderStatus> {
 
 async function fetchAws(): Promise<ProviderStatus> {
   const url = "https://status.aws.amazon.com/rss/all.rss";
-  const { ok, status, text } = await fetchText(url);
+  const { ok, status: httpStatus, text } = await fetchText(url);
 
-  if (!ok) throw new Error(`AWS status HTTP ${status}`);
+  if (!ok) throw new Error(`AWS status HTTP ${httpStatus}`);
 
   let parsed: ReturnType<typeof parseRssLatest>;
   try {
@@ -140,7 +140,7 @@ async function fetchAws(): Promise<ProviderStatus> {
 
 async function fetchGoogle(): Promise<ProviderStatus> {
   const url = "https://status.cloud.google.com/";
-  const res = await fetch(url, { cf: { cacheEverything: false } });
+  const res = await fetch(url, { cf: { cacheEverything: false } } as any);
   if (!res.ok) throw new Error(`Google Cloud status HTTP ${res.status}`);
   const html = await res.text();
 
@@ -168,11 +168,23 @@ async function fetchMarkets(apiKey?: string): Promise<[MarketQuote[] | null, str
     responses.map(async (res, idx) => {
       const data = await res.json();
       const entry = Array.isArray(data) ? data[0] : data;
+      const price = Number(entry?.price) || 0;
+      const change = Number(entry?.change) || 0;
+      const rawPct = entry?.changesPercentage ?? entry?.dp;
+      let pct = Number(rawPct);
+      if (Number.isNaN(pct)) {
+        const rawString = String(rawPct ?? "").replace(/[^0-9.+\-]/g, "");
+        pct = Number(rawString);
+      }
+      if (Number.isNaN(pct) && price !== 0 && price - change !== 0) {
+        pct = (change / (price - change)) * 100;
+      }
+
       return {
         symbol: symbols[idx],
-        price: Number(entry?.price) || 0,
-        change: Number(entry?.change) || 0,
-        changesPercentage: Number(entry?.changesPercentage) || 0,
+        price,
+        change,
+        changesPercentage: Number.isFinite(pct) ? Number(pct.toFixed(2)) : 0,
       } satisfies MarketQuote;
     })
   );
