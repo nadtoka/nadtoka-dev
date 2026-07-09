@@ -89,7 +89,20 @@ async function fetchAzure(): Promise<ProviderStatus> {
 
   const summary = normalizeTitle(parsed.title) || "No recent incidents";
   const updated = parsed.updated?.trim() || null;
-  return withStatus("Azure", summary, updated, deriveStatus(summary));
+
+  let status = deriveStatus(summary);
+  let finalSummary = summary;
+
+  if (updated) {
+    const eventTime = Date.parse(updated);
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    if (!isNaN(eventTime) && Date.now() - eventTime > oneDayMs) {
+      status = "ok";
+      finalSummary = "No active incidents";
+    }
+  }
+
+  return withStatus("Azure", finalSummary, updated, status);
 }
 
 async function fetchAws(): Promise<ProviderStatus> {
@@ -109,7 +122,20 @@ async function fetchAws(): Promise<ProviderStatus> {
 
   const summary = normalizeTitle(parsed.title) || "No recent incidents";
   const updated = parsed.updated?.trim() || null;
-  return withStatus("AWS", summary, updated, deriveStatus(summary));
+
+  let status = deriveStatus(summary);
+  let finalSummary = summary;
+
+  if (updated) {
+    const eventTime = Date.parse(updated);
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    if (!isNaN(eventTime) && Date.now() - eventTime > oneDayMs) {
+      status = "ok";
+      finalSummary = "No active incidents";
+    }
+  }
+
+  return withStatus("AWS", finalSummary, updated, status);
 }
 
 async function fetchGoogle(): Promise<ProviderStatus> {
@@ -177,6 +203,7 @@ function withStatus(
 
 function deriveStatus(summary: string): ProviderStatus["status"] {
   const lowered = summary.toLowerCase();
+  if (lowered.includes("resolved") || lowered.includes("mitigated") || lowered.includes("operational")) return "ok";
   if (/(outage|service disruption|major)/i.test(lowered)) return "down";
   if (/(investigating|degraded|elevated error|partial)/i.test(lowered)) return "warn";
   if (/no broad severe incidents|operational|no recent incidents/i.test(lowered)) return "ok";
