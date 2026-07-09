@@ -170,14 +170,17 @@ async function fetchMarkets(apiKey?: string): Promise<[MarketQuote[] | null, str
       const entry = Array.isArray(data) ? data[0] : data;
       const price = Number(entry?.price) || 0;
       const change = Number(entry?.change) || 0;
-      const rawPct = entry?.changesPercentage ?? entry?.dp;
-      let pct = Number(rawPct);
-      if (Number.isNaN(pct)) {
-        const rawString = String(rawPct ?? "").replace(/[^0-9.+\-]/g, "");
-        pct = Number(rawString);
-      }
-      if (Number.isNaN(pct) && price !== 0 && price - change !== 0) {
-        pct = (change / (price - change)) * 100;
+
+      // Extract and safely parse percentage
+      let pct = Number(entry?.changesPercentage ?? entry?.dp);
+
+      // If parsing failed (NaN) OR it returned 0 but there is an active price change, force manual calculation
+      if (Number.isNaN(pct) || (pct === 0 && change !== 0)) {
+        if (price !== 0 && price - change !== 0) {
+          pct = (change / (price - change)) * 100;
+        } else {
+          pct = 0;
+        }
       }
 
       return {
