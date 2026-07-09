@@ -74,7 +74,7 @@
             <li class="chip">CI/CD</li>
             <li class="chip">Terraform</li>
             <li class="chip">Cloud (AWS/GCP/OpenStack)</li>
-            <li class="chip">Prometheus/Grafana</li>
+            <li class="chip">VictoriaMetrics/Grafana</li>
             <li class="chip">Security baseline</li>
           </ul>
 
@@ -167,9 +167,10 @@ x-frame-options: DENY</code></pre>
             <p>Fast, reliable releases with predictable pipelines.</p>
             <ul class="list">
               <li>GitHub Actions / GitLab CI pipelines (build, test, deploy)</li>
-              <li>Reusable templates, caching & parallelism</li>
-              <li>Runners setup & troubleshooting</li>
+              <li>Reusable templates, caching &amp; parallelism</li>
+              <li>Runners setup &amp; troubleshooting</li>
               <li>Secure delivery: least-privilege + secrets hygiene</li>
+              <li>Established a secure container management workflow with a local Harbor registry, including automated replication of production images to AWS ECR</li>
             </ul>
           </article>
 
@@ -196,8 +197,8 @@ x-frame-options: DENY</code></pre>
           </article>
 
           <article class="card">
-            <h3>Observability (Prometheus / Grafana / Loki)</h3>
-            <p>Actionable dashboards and alerts (signal > noise).</p>
+            <h3>Observability (VictoriaMetrics (High-throughput observability) / Grafana / Loki)</h3>
+            <p>Actionable dashboards and alerts (signal &gt; noise).</p>
             <ul class="list">
               <li>Metrics, dashboards, alert rules</li>
               <li>SLO-aware alerting (pragmatic)</li>
@@ -241,10 +242,11 @@ x-frame-options: DENY</code></pre>
 
           <article class="card card--wide">
             <h3>Containers (pragmatic)</h3>
-            <p>Docker/Swarm/Kubernetes where it actually helps your workload.</p>
+            <p>Docker/Swarm/Kubernetes and Harbor where it actually helps your workload.</p>
             <ul class="list">
               <li>Containerization, Compose/Swarm operations</li>
               <li>Practical Kubernetes deployments (when needed)</li>
+              <li>Registry: Harbor for secure image management and replication</li>
               <li>GitOps delivery (optional)</li>
             </ul>
           </article>
@@ -392,8 +394,8 @@ x-frame-options: DENY</code></pre>
           </article>
 
           <article class="card">
-            <h3>On-prem Observability Stack (Prometheus + Grafana + Alertmanager)</h3>
-            <p>Monitoring for isolated networks with actionable dashboards and alert routing.</p>
+            <h3>On-prem Observability Stack (VictoriaMetrics + Grafana + Alertmanager)</h3>
+            <p>Developed a centralized monitoring architecture featuring VictoriaMetrics (as a high-performance drop-in Prometheus replacement), Grafana, and Alertmanager across distributed server nodes.</p>
             <ul class="list">
               <li>Coverage across 5 servers (LB, DB, core, maintenance, services)</li>
               <li>IaC via Terraform + repeatable builds (Chef Kitchen)</li>
@@ -411,6 +413,14 @@ x-frame-options: DENY</code></pre>
               <li>HAProxy TLS termination and routing policies</li>
               <li>IDS/IPS baseline with tuned rules</li>
               <li>Result: reduced attack surface and safer access</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Centralized Identity &amp; SSH Access Management</h3>
+            <p>Designed a secure, centralized authentication system using HashiCorp Vault and LDAP to eliminate static credentials.</p>
+            <ul class="list">
+              <li>Configured HashiCorp Vault to act as a Certificate Authority (CA) for dynamic SSH key signing, mitigating long-lived key risks.</li>
+              <li>Integrated LDAP to deliver unified role-based access control (RBAC) across distributed Linux environments, OpenVPN, and XRDP.</li>
             </ul>
           </article>
           <article class="card">
