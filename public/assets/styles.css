@@ -486,8 +486,17 @@ h3 { margin: 0 0 8px; font-size: 18px; }
   border-radius: var(--radius);
   background: var(--card);
   padding: 16px;
+  display: flex;
+  flex-direction: column;
 }
 .contact__value { margin: 6px 0 12px; font-size: 16px; }
+
+.contact__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
 
 .howto { margin-top: 18px; }
 .howto__list {

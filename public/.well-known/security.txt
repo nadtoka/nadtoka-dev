@@ -1,4 +1,4 @@
-Contact: mailto:YOUR_SECURITY_EMAIL
+Contact: mailto:alex.nadtoka@gmail.com
 Preferred-Languages: uk, en
 Canonical: https://nadtoka.dev/.well-known/security.txt
-Expires: 2026-12-17T00:00:00.000Z
+Expires: 2027-12-31T23:59:59.000Z

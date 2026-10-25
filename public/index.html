@@ -455,11 +455,14 @@ x-frame-options: DENY</code></pre>
 
         <div class="contact">
           <div class="contact__card">
-            <h3>Email</h3>
+            <h3>Get in touch</h3>
             <p class="contact__value">
               <a href="mailto:alex.nadtoka@gmail.com" id="emailLink">alex.nadtoka@gmail.com</a>
             </p>
-            <button class="btn btn--secondary" type="button" id="copyEmail">Copy email</button>
+            <div class="contact__actions">
+              <a class="btn btn--secondary" href="/linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile (opens in a new tab)">LinkedIn</a>
+              <button class="btn btn--secondary" type="button" id="copyEmail">Copy email</button>
+            </div>
 
             <p class="tiny muted">
               Prefer a short context: company, tech stack, what’s broken, and urgency.
@@ -467,15 +470,15 @@ x-frame-options: DENY</code></pre>
           </div>
 
           <div class="contact__card">
-            <h3>Links</h3>
-            <ul class="list">
-              <li><a href="/linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in a new tab)">LinkedIn</a></li>
-              <li><a href="/github" title="GitHub profile" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)">GitHub</a></li>
-              <li><a href="/huggingface" title="Hugging Face profile" target="_blank" rel="noopener noreferrer" aria-label="Hugging Face (opens in a new tab)">Hugging Face</a></li>
-            </ul>
+            <h3>Profiles &amp; Security</h3>
+            <div class="contact__actions">
+              <a class="btn btn--secondary" href="/github" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)">GitHub</a>
+              <a class="btn btn--secondary" href="/huggingface" target="_blank" rel="noopener noreferrer" aria-label="Hugging Face (opens in a new tab)">Hugging Face</a>
+              <a class="btn btn--secondary" href="/assets/cv.pdf" target="_blank" rel="noopener noreferrer" aria-label="Download CV (opens in a new tab)">CV (PDF)</a>
+            </div>
 
             <p class="tiny muted">
-              Security contact: <a href="/.well-known/security.txt">security.txt</a>
+              Security contact: <a href="/.well-known/security.txt">security.txt</a> (RFC 9116)
             </p>
           </div>
         </div>
